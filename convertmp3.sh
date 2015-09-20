@@ -28,6 +28,14 @@ do
 done
 #remove os arquivos m4a
 find . -iname "*.m4a" -exec rm -f {} \;
+
+# Remove os "_" de nomes dos arquivos.
+ls *.mp3 | while read files;
+do
+	FILE_B=`echo $files | tr '_' ' ' `;
+	mv "$files" "$FILE_B";
+done
+
 echo -e "\nPronto! :)"
 
 
