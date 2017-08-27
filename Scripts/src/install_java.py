@@ -12,7 +12,6 @@ from subprocess import call
 
 
 VERSION = "1.1"
-
 # Site contendo os arquivos para Download
 url = 'http://www.java.com/inc/BrowserRedirect1.jsp?locale=pt_BR'
 
@@ -175,6 +174,7 @@ print("""Escolha uma das opções:
 # Versão 2.0 terá validade de entrada, vá que alguém não saiba ler, :)
 
 choice = int(raw_input('Opção: '))
+
 
 #Define a versão a ser instalada
 if choice == 1:
