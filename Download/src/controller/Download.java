@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package download;
+package controller;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import sun.net.ftp.FtpClient;
+import view.TelaPrincipal;
 
 /**
  *
@@ -28,41 +29,45 @@ public class Download {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        String site = "ftp://arpoador.datasus.gov.br/siasus/sia/";
-//        String site = "http://www.iconeweb.com.br/download/suporte_remoto_iconeweb.exe";
-        String pathLocal = "/home/henrique/";
-        System.out.println("Baixando o arquivo....");
-        gravaArquivoDeURL(site, pathLocal);
-        System.out.println("Concluído");
-
-    }
-
-    public static void gravaArquivoDeURL(String stringUrl, String pathLocal) {
-
+        public static Boolean terminou = false;
+        public static int count;
+    public static void downloadArquivo(String stringUrl, String pathLocal) {
         try {
 
             String nomeArquivoLocal = getNomeArquivo(stringUrl);
+            System.out.println("Baixando o arquivo " + nomeArquivoLocal);
             URL url = new URL(stringUrl + nomeArquivoLocal);
             InputStream is = url.openStream();
             FileOutputStream fos = new FileOutputStream(pathLocal + nomeArquivoLocal);
             byte[] buffer = new byte[4096];
             int bytes = -1;
-            while ((bytes = is.read(buffer)) != -1) {
+            count = 0;
+         
+//                  TelaPrincipal.progress.setMaximum(count);
+            int kont = 0;      
+            while ((bytes = is.read(buffer)) != -1){
                 fos.write(buffer, 0, bytes);
+                terminou = false;
 
             }
             //Nao se esqueca de sempre fechar as streams apos seu uso!
             is.close();
+            
             fos.close();
+            count = 0;
+            terminou = true;
+            System.out.println("Arquivo baixado");
+            
         } catch (Exception e) {
             System.out.println("Erro ao realizar o download \n" + e);
 
         }
+        
     }
 
     public static String getNomeArquivo(String urlSite) throws MalformedURLException, IOException {
-        String nomeArquivo;
+        String nomeArquivo = null;
+        int tamArq = 0;
         URL url = new URL(urlSite);
         URLConnection conn = url.openConnection();
         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -71,16 +76,25 @@ public class Download {
         //lista os arquivos 
         String[] aux = null;
         while ((linha = br.readLine()) != null) {
+//            System.out.println(linha);
             if (linha.contains("BDSIA") && linha.contains("exe")) {
                 aux = linha.split(" ");
 //                                System.out.print("data: " + aux[0]);
 //                                System.out.print(" | hora: " + aux[2]);
-//                                System.out.print(" | arquivo " + aux[17]);
+//                                System.out.println(" | Tamanho do arquivo " + aux[16]);
 //                                System.out.println(" ");
+                //Geralmente o último arquivo é o mais atualizado
+                nomeArquivo = aux[17];
+                tamArq = Integer.parseInt(aux[16]);
 
+            } else if (linha.contains("BPA") && linha.contains("exe")) {
+                //Geralmente fica apenas o mais atualizado no diretório
+                aux = linha.split(" ");
+                nomeArquivo = aux[17];
+                tamArq = Integer.parseInt(aux[16]);
             }
         }
-        nomeArquivo = aux[17];
+                System.out.println("Tamanho do arquivo " + tamArq*0.9);
         return nomeArquivo;
     }
 }
