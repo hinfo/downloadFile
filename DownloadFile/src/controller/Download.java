@@ -52,9 +52,7 @@ public class Download {
                 terminou = false;
 
             }
-            //Nao se esqueca de sempre fechar as streams apos seu uso!
             is.close();
-
             fos.close();
             count = 0;
             terminou = true;
